@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @lease_snapshot %>
+
+<div>
+  <%= link_to "Edit this lease snapshot", edit_lease_snapshot_path(@lease_snapshot) %> |
+  <%= link_to "Back to lease snapshots", lease_snapshots_path %>
+
+  <%= button_to "Destroy this lease snapshot", @lease_snapshot, method: :delete %>
+</div>

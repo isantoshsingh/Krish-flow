@@ -1,0 +1,58 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Lands" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>🏞️ Lands</h1>
+  <%= link_to "Add New Land", new_land_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <%= form_with url: lands_path, method: :get, local: true, class: "d-flex" do |f| %>
+    <%= f.text_field :search, placeholder: "Search by location...", value: params[:search], class: "form-control me-2" %>
+    <%= f.submit "Search", class: "btn btn-outline-secondary" %>
+    <% end %>
+  </div>
+  <div class="col-md-6">
+    <%= form_with url: lands_path, method: :get, local: true, class: "d-flex" do |f| %>
+    <%= f.select :landowner_id, options_from_collection_for_select(@landowners, :id, :name, params[:landowner_id]), 
+                  { prompt: "Filter by landowner..." }, { class: "form-select me-2" } %>
+    <%= f.submit "Filter", class: "btn btn-outline-secondary" %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Lands List -->
+<div class="card">
+  <div class="card-body">
+    <% if @lands.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Size</th>
+            <th>Landowner</th>
+            <th>Current Status</th>
+            <th>Investment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @lands.each do |land| %>
+          <%= render land %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% else %>
+    <div class="text-center py-5">
+      <h4 class="text-muted">No lands found</h4>
+      <p class="text-muted">Start by adding your first land</p>
+      <%= link_to "Add Land", new_land_path, class: "btn btn-primary" %>
+    </div>
+    <% end %>
+  </div>
+</div>

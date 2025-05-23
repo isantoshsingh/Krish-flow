@@ -1,0 +1,26 @@
+<tr id="<%= dom_id land %>">
+  <td><strong><%= land.location %></strong></td>
+  <td><%= land.display_size %></td>
+  <td><%= land.landowner.name %></td>
+  <td>
+    <% if land.is_leased? %>
+    <span class="badge bg-success">Leased</span>
+    <% else %>
+    <span class="badge bg-secondary">Available</span>
+    <% end %>
+  </td>
+  <td>
+    <% if land.is_leased? %>
+    ₹<%= number_with_delimiter(land.total_investment) %>
+    <% else %>
+    <span class="text-muted">-</span>
+    <% end %>
+  </td>
+  <td>
+    <%= link_to "View", land, class: "btn btn-sm btn-outline-primary" %>
+    <%= link_to "Edit", edit_land_path(land), class: "btn btn-sm btn-outline-secondary" %>
+    <% unless land.is_leased? %>
+    <%= link_to "Lease", new_land_lease_snapshot_path(land), class: "btn btn-sm btn-success" %>
+    <% end %>
+  </td>
+</tr>
