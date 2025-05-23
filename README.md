@@ -83,9 +83,9 @@ Payment:
 
 - **Backend**: Ruby on Rails 8
 - **Database**: PostgreSQL
-- **Frontend**: Hotwire (Turbo, Stimulus) or React (optional)
+- **Frontend**: Bootstrap + Hotwire (Turbo, Stimulus) or React (optional)
 - **Authentication**: Devise
-- **Exporting**: `prawn` for PDFs, `csv`/`axlsx` for data exports
+- **Exporting**: `prawn` for PDFs, `csv`/`caxlsx` for data exports
 
 ---
 
