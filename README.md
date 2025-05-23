@@ -1,52 +1,81 @@
-
-
 # 🌾 KrishFlow
 
-**KrishFlow** is a Ruby on Rails 8 application designed to simplify the management of agricultural land leasing and financial returns.  
-It helps you track land leased from owners and subleased to farmers, monitor yearly investments, partial payments, and expected returns.
+**KrishFlow** is a Ruby on Rails 8 application built to simplify agricultural land leasing and returns tracking.
+It helps you manage lands leased from landowners and subleased to farmers, record yearly investments, partial payments, and monitor returns – all with historical context.
 
 ---
 
 ## 🚀 Features
 
-### 👨‍🌾 Land & Farmer Management
-- Add leased land with size (in bighas), location, and investment amount.
-- Link each land to a farmer who cultivates it.
+### 🧑‍🌾 Person Management
+- Store details of individuals involved in the leasing process.
+- Each person can be a **landowner**, **farmer**, or **both**, depending on their role in a lease.
+- Person details:
+  - Name
+  - Phone number
+  - Village
+  - District
+
+### 🌱 Land Management
+- Add leased land with:
+  - Size value
+  - Unit (`bigha` or `biswa`)
+  - Location
+- Automatic conversion: `1 bigha = 20 biswas`
+- All land sizes stored consistently in `biswas`
+- Associate each land with a landowner (via `Person` model)
 
 ### 💰 Return & Payment Tracking
-- Track expected return per land annually (₹17K–₹20K per ₹1L investment).
-- Record partial payments received from farmers throughout the financial year.
-- Automatically calculate and show outstanding returns.
+- Track expected returns from each land annually (e.g., ₹17K–₹20K per ₹1L investment)
+- Log partial payments received from farmers
+- Track outstanding returns automatically
 
 ### 📅 Financial Year-Based Lease Snapshots
-- Track all lease agreements by **financial year** (e.g., `2024-25`, `2025-26`).
-- Investments can be increased or reduced only at the start of a new financial year.
-- Maintain historical data for each lease year – no overwriting.
+- Capture each land's lease conditions on a **per-financial-year** basis (e.g., `2024-25`, `2025-26`)
+- Investment changes can only happen at the start of a new financial year
+- Retain complete lease history per land and year
 
 ### 📊 Dashboard & Reports
-- Summarize key metrics:
+- Overview of:
   - Total lands
   - Total investment
-  - Expected return
-  - Received payments
-  - Pending returns
-- Export reports by land, farmer, or financial year (CSV/PDF).
+  - Expected vs. received returns
+- Export reports by land, farmer, or year (CSV/PDF)
 
 ---
 
 ## 🗂️ Data Model Overview
 
-### `Land`
-- `location`, `size_in_bigha`
+```yaml
+Person:
+  name: string
+  phone: string
+  village: string
+  district: string
 
-### `Farmer`
-- `name`, `contact_info`
+Land:
+  location: string
+  size_value: decimal
+  size_unit: string        # 'bigha' or 'biswa'
+  size_in_biswas: decimal
+  landowner_id: references :person
 
-### `LeaseSnapshot`
-- `land_id`, `farmer_id`, `financial_year`, `investment_amount`, `expected_return`, `start_date`, `end_date`, `status`
+LeaseSnapshot:
+  land_id: references
+  farmer_id: references :person
+  financial_year: string
+  investment_amount: decimal
+  expected_return: decimal
+  start_date: date
+  end_date: date
+  status: string
 
-### `Payment`
-- `lease_snapshot_id`, `amount`, `payment_date`, `mode`
+Payment:
+  lease_snapshot_id: references
+  amount: decimal
+  payment_date: date
+  mode: string
+
 
 ---
 
