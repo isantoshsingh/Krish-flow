@@ -2,8 +2,10 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t krishflow .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name krishflow krishflow
+
+# docker build -t krish_flow .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name krish_flow krish_flow
+
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
