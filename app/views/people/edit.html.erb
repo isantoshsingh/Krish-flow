@@ -1,0 +1,19 @@
+<% content_for :title, "Editing person" %>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3>Edit Person</h3>
+      </div>
+      <div class="card-body">
+        <%= render 'form', person: @person %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <%= link_to "Show this person", @person %> |
+  <%= link_to "Back to people", people_path %>
+</div>

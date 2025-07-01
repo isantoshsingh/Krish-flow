@@ -1,0 +1,184 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>🌾 Dashboard</h1>
+  <div class="text-muted">
+    Financial Year: <strong><%= @current_fy %></strong>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-5">
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card bg-primary text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4><%= @stats[:total_lands] %></h4>
+            <p class="mb-0">Total Lands</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-map fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card bg-success text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4><%= @stats[:leased_lands] %></h4>
+            <p class="mb-0">Leased Lands</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-handshake fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card bg-info text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>₹<%= number_with_delimiter(@stats[:total_investment]) %></h4>
+            <p class="mb-0">Total Investment</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-rupee-sign fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 mb-3">
+    <div class="card bg-warning text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>₹<%= number_with_delimiter(@stats[:outstanding_amount]) %></h4>
+            <p class="mb-0">Outstanding</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-clock fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Financial Overview -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>💰 Financial Overview (<%= @current_fy %>)</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6">
+            <p class="mb-1"><strong>Expected Returns:</strong></p>
+            <h4 class="text-success">₹<%= number_with_delimiter(@stats[:expected_returns]) %></h4>
+          </div>
+          <div class="col-6">
+            <p class="mb-1"><strong>Received:</strong></p>
+            <h4 class="text-primary">₹<%= number_with_delimiter(@stats[:received_payments]) %></h4>
+          </div>
+        </div>
+
+        <div class="progress mt-3">
+          <% collection_percentage = @stats[:expected_returns] > 0 ? (@stats[:received_payments].to_f / @stats[:expected_returns] * 100).round(1) : 0 %>
+          <div class="progress-bar" role="progressbar" style="width: <%= collection_percentage %>%">
+            <%= collection_percentage %>%
+          </div>
+        </div>
+        <small class="text-muted">Collection Progress</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>👥 People Overview</h5>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-6">
+            <h3 class="text-primary"><%= @stats[:total_landowners] %></h3>
+            <p class="mb-0">Landowners</p>
+          </div>
+          <div class="col-6">
+            <h3 class="text-success"><%= @stats[:total_farmers] %></h3>
+            <p class="mb-0">Farmers</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>💳 Recent Payments</h5>
+        <%= link_to "View All", lease_snapshots_path, class: "btn btn-sm btn-outline-primary" %>
+      </div>
+      <div class="card-body">
+        <% if @recent_payments.any? %>
+        <% @recent_payments.each do |payment| %>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <div>
+            <strong><%= payment.lease_snapshot.farmer.name %></strong><br>
+            <small class="text-muted"><%= payment.lease_snapshot.land.location %></small>
+          </div>
+          <div class="text-end">
+            <strong class="text-success">₹<%= number_with_delimiter(payment.amount) %></strong><br>
+            <small class="text-muted"><%= payment.payment_date.strftime("%d %b") %></small>
+          </div>
+        </div>
+        <% end %>
+        <% else %>
+        <p class="text-muted text-center">No recent payments</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>🌱 Active Leases</h5>
+        <%= link_to "View All", lease_snapshots_path, class: "btn btn-sm btn-outline-primary" %>
+      </div>
+      <div class="card-body">
+        <% if @active_leases.any? %>
+        <% @active_leases.each do |lease| %>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <div>
+            <strong><%= lease.land.location %></strong><br>
+            <small class="text-muted">Farmer: <%= lease.farmer.name %></small>
+          </div>
+          <div class="text-end">
+            <% if lease.outstanding_amount > 0 %>
+            <span class="badge bg-warning">₹<%= number_with_delimiter(lease.outstanding_amount) %> due</span>
+            <% else %>
+            <span class="badge bg-success">Paid</span>
+            <% end %>
+          </div>
+        </div>
+        <% end %>
+        <% else %>
+        <p class="text-muted text-center">No active leases</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

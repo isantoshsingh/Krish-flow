@@ -1,0 +1,156 @@
+<p style="color: green"><%= notice %></p>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><%= @person.name %></h1>
+  <div>
+    <%= link_to "Edit", edit_person_path(@person), class: "btn btn-outline-primary" %>
+    <%= link_to "Back", people_path, class: "btn btn-outline-secondary" %>
+  </div>
+</div>
+
+<!-- Person Details -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>📞 Contact Information</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Phone:</strong> <%= @person.phone %></p>
+        <p><strong>Village:</strong> <%= @person.village %></p>
+        <p><strong>District:</strong> <%= @person.district %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>📊 Summary</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Role:</strong>
+          <% if @person.is_landowner? && @person.is_farmer? %>
+          <span class="badge bg-info">Landowner & Farmer</span>
+          <% elsif @person.is_landowner? %>
+          <span class="badge bg-primary">Landowner</span>
+          <% elsif @person.is_farmer? %>
+          <span class="badge bg-success">Farmer</span>
+          <% else %>
+          <span class="badge bg-secondary">No Role</span>
+          <% end %>
+        </p>
+
+        <% if @person.is_landowner? %>
+        <p><strong>Owned Land:</strong> <%= @person.total_owned_land_size %> biswas</p>
+        <p><strong>Lands Owned:</strong> <%= @person.owned_lands.count %></p>
+        <% end %>
+
+        <% if @person.is_farmer? %>
+        <p><strong>Farmed Land:</strong> <%= @person.total_farmed_land_size %> biswas</p>
+        <p><strong>Active Leases:</strong> <%= @person.lease_snapshots.active.count %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Owned Lands -->
+<% if @person.is_landowner? %>
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5>🏞️ Owned Lands</h5>
+    <%= link_to "Add Land", new_land_path(landowner_id: @person.id), class: "btn btn-sm btn-primary" %>
+  </div>
+  <div class="card-body">
+    <% if @person.owned_lands.any? %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Size</th>
+            <th>Current Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @person.owned_lands.each do |land| %>
+          <tr>
+            <td><%= land.location %></td>
+            <td><%= land.display_size %></td>
+            <td>
+              <% if land.is_leased? %>
+              <span class="badge bg-success">Leased</span>
+              <% else %>
+              <span class="badge bg-secondary">Available</span>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to "View", land, class: "btn btn-sm btn-outline-primary" %>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% else %>
+    <p class="text-muted text-center">No owned lands</p>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
+<!-- Farming Leases -->
+<% if @person.is_farmer? %>
+<div class="card">
+  <div class="card-header">
+    <h5>🌾 Farming Leases</h5>
+  </div>
+  <div class="card-body">
+    <% if @person.lease_snapshots.any? %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Land</th>
+            <th>Financial Year</th>
+            <th>Investment</th>
+            <th>Expected Return</th>
+            <th>Payments</th>
+            <th>Outstanding</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @person.lease_snapshots.includes(:land).order(financial_year: :desc).each do |lease| %>
+          <tr>
+            <td><%= lease.land.location %></td>
+            <td><%= lease.financial_year %></td>
+            <td>₹<%= number_with_delimiter(lease.investment_amount) %></td>
+            <td>₹<%= number_with_delimiter(lease.expected_return) %></td>
+            <td>₹<%= number_with_delimiter(lease.total_payments) %></td>
+            <td>
+              <% if lease.outstanding_amount > 0 %>
+              <span class="text-danger">₹<%= number_with_delimiter(lease.outstanding_amount) %></span>
+              <% else %>
+              <span class="text-success">₹0</span>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge bg-<%= lease.status == 'active' ? 'success' : 'secondary' %>">
+                <%= lease.status.humanize %>
+              </span>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% else %>
+    <p class="text-muted text-center">No farming leases</p>
+    <% end %>
+  </div>
+</div>
+<% end %>

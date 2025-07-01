@@ -1,0 +1,11 @@
+<% content_for :title, "New lease snapshot" %>
+
+<h1>New lease snapshot</h1>
+
+<%= render "form", lease_snapshot: @lease_snapshot %>
+
+<br>
+
+<div>
+  <%= link_to "Back to lease snapshots", lease_snapshots_path %>
+</div>

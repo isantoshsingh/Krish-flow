@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>👥 People</h1>
+  <%= link_to "Add New Person", new_person_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Search -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <%= form_with url: people_path, method: :get, local: true, class: "d-flex" do |f| %>
+    <%= f.text_field :search, placeholder: "Search by name...", value: params[:search], class: "form-control me-2" %>
+    <%= f.submit "Search", class: "btn btn-outline-secondary" %>
+    <% end %>
+  </div>
+</div>
+
+<!-- People List -->
+<div class="card">
+  <div class="card-body">
+    <% if @people.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Location</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @people.each do |person| %>
+          <%= render person %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% else %>
+    <div class="text-center py-5">
+      <h4 class="text-muted">No people found</h4>
+      <p class="text-muted">Start by adding your first person</p>
+      <%= link_to "Add Person", new_person_path, class: "btn btn-primary" %>
+    </div>
+    <% end %>
+  </div>
+</div>
+
+<div id="people">
+  <% @people.each do |person| %>
+  <%= render person %>
+  <p>
+    <%= link_to "Show this person", person %>
+  </p>
+  <% end %>
+</div>
+
+<%= link_to "New person", new_person_path %>

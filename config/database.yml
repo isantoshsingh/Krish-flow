@@ -22,13 +22,11 @@ default: &default
 
 development:
   <<: *default
-  database: krish_flow_dev
-
+  database: krishflow_dev
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  #username: krish_flow
 
   # The password associated with the PostgreSQL role (username).
   #password:
@@ -56,7 +54,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: krish_flow_test
+  database: krishflow_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -81,18 +79,18 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: krish_flow_production
-    username: krish_flow
-    password: <%= ENV["KRISH_FLOW_DATABASE_PASSWORD"] %>
+    database: krishflow_production
+    username: krishflow
+    password: <%= ENV["KRISHFLOW_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
-    database: krish_flow_production_cache
+    database: krishflow_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: krish_flow_production_queue
+    database: krishflow_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: krish_flow_production_cable
+    database: krishflow_production_cable
     migrations_paths: db/cable_migrate

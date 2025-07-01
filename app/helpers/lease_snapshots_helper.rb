@@ -1,0 +1,2 @@
+module LeaseSnapshotsHelper
+end

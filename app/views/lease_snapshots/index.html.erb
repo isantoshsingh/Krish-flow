@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Lease snapshots" %>
+
+<h1>Lease snapshots</h1>
+
+<div id="lease_snapshots">
+  <% @lease_snapshots.each do |lease_snapshot| %>
+    <%= render lease_snapshot %>
+    <p>
+      <%= link_to "Show this lease snapshot", lease_snapshot %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New lease snapshot", new_lease_snapshot_path %>

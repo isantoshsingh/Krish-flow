@@ -1,0 +1,272 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "#{@person.name} - Farming Activities" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>🌾 Lands Farmed by <%= @person.name %></h1>
+  <div>
+    <%= link_to "View Profile", @person, class: "btn btn-outline-secondary" %>
+    <%= link_to "Back to People", people_path, class: "btn btn-outline-secondary" %>
+  </div>
+</div>
+
+<!-- Farmer Summary -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>👨‍🌾 Farmer Details</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Name:</strong> <%= @person.name %></p>
+        <p><strong>Phone:</strong> <%= @person.phone %></p>
+        <p><strong>Location:</strong> <%= @person.full_address %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>📊 Farming Portfolio Summary</h5>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-3">
+            <h4 class="text-primary"><%= @lease_snapshots.count %></h4>
+            <small class="text-muted">Total Leases</small>
+          </div>
+          <div class="col-3">
+            <h4 class="text-success"><%= @person.total_farmed_land_size %></h4>
+            <small class="text-muted">Biswas</small>
+          </div>
+          <div class="col-3">
+            <h4 class="text-info"><%= @lease_snapshots.select { |ls| ls.status == 'active' }.count %></h4>
+            <small class="text-muted">Active</small>
+          </div>
+          <div class="col-3">
+            <h4 class="text-warning">
+              <% current_year_leases = @lease_snapshots.select { |ls| ls.financial_year == Date.current.strftime('%Y-%y') } %>
+              <%= current_year_leases.count %>
+            </h4>
+            <small class="text-muted">This Year</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h6>💰 Financial Overview</h6>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <% total_investment = @lease_snapshots.sum(&:investment_amount) %>
+          <% total_expected = @lease_snapshots.sum(&:expected_return) %>
+          <% total_payments = @lease_snapshots.sum(&:total_payments) %>
+          <% total_outstanding = @lease_snapshots.sum(&:outstanding_amount) %>
+          
+          <div class="col-md-3">
+            <h5 class="text-primary">₹<%= number_with_delimiter(total_investment) %></h5>
+            <small class="text-muted">Total Investment</small>
+          </div>
+          <div class="col-md-3">
+            <h5 class="text-success">₹<%= number_with_delimiter(total_expected) %></h5>
+            <small class="text-muted">Expected Returns</small>
+          </div>
+          <div class="col-md-3">
+            <h5 class="text-info">₹<%= number_with_delimiter(total_payments) %></h5>
+            <small class="text-muted">Payments Received</small>
+          </div>
+          <div class="col-md-3">
+            <h5 class="<%= total_outstanding > 0 ? 'text-danger' : 'text-success' %>">
+              ₹<%= number_with_delimiter(total_outstanding) %>
+            </h5>
+            <small class="text-muted">Outstanding</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lease History -->
+<div class="card">
+  <div class="card-header">
+    <h5>📋 Farming Lease History</h5>
+  </div>
+  <div class="card-body">
+    <% if @lease_snapshots.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Land Details</th>
+            <th>Landowner</th>
+            <th>Financial Year</th>
+            <th>Investment</th>
+            <th>Expected Return</th>
+            <th>Payments</th>
+            <th>Outstanding</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @lease_snapshots.each do |lease| %>
+          <tr class="<%= 'table-success' if lease.status == 'active' %>">
+            <td>
+              <strong><%= lease.land.location %></strong>
+              <br>
+              <small class="text-muted">
+                <%= lease.land.display_size %> 
+                (<%= lease.land.size_in_biswas %> biswas)
+              </small>
+            </td>
+            <td>
+              <%= link_to lease.land.landowner.name, person_path(lease.land.landowner), class: "text-decoration-none" %>
+              <br>
+              <small class="text-muted"><%= lease.land.landowner.phone %></small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark"><%= lease.financial_year %></span>
+              <br>
+              <small class="text-muted">
+                <%= lease.start_date.strftime('%b %d') %> - <%= lease.end_date.strftime('%b %d, %Y') %>
+              </small>
+            </td>
+            <td>
+              <span class="text-primary">₹<%= number_with_delimiter(lease.investment_amount) %></span>
+            </td>
+            <td>
+              <span class="text-success">₹<%= number_with_delimiter(lease.expected_return) %></span>
+            </td>
+            <td>
+              <span class="text-info">₹<%= number_with_delimiter(lease.total_payments) %></span>
+              <% if lease.payments.any? %>
+              <br>
+              <small class="text-muted"><%= lease.payments.count %> payment(s)</small>
+              <% end %>
+            </td>
+            <td>
+              <% if lease.outstanding_amount > 0 %>
+                <span class="text-danger">₹<%= number_with_delimiter(lease.outstanding_amount) %></span>
+              <% else %>
+                <span class="text-success">₹0</span>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge bg-<%= lease.status == 'active' ? 'success' : lease.status == 'completed' ? 'primary' : 'secondary' %>">
+                <%= lease.status.humanize %>
+              </span>
+            </td>
+            <td>
+              <div class="btn-group-vertical" role="group">
+                <%= link_to "View", lease, class: "btn btn-sm btn-outline-primary" %>
+                <%= link_to "Land", lease.land, class: "btn btn-sm btn-outline-secondary" %>
+                <% if lease.status == 'active' %>
+                  <%= link_to "Add Payment", new_lease_snapshot_payment_path(lease), class: "btn btn-sm btn-outline-success" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="mt-4">
+      <h6>💳 Recent Payments</h6>
+      <% recent_payments = @lease_snapshots.flat_map(&:payments).sort_by(&:payment_date).reverse.first(5) %>
+      <% if recent_payments.any? %>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Land</th>
+              <th>Mode</th>
+              <th>Financial Year</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recent_payments.each do |payment| %>
+            <tr>
+              <td><%= payment.payment_date.strftime('%b %d, %Y') %></td>
+              <td class="text-success">₹<%= number_with_delimiter(payment.amount) %></td>
+              <td><%= payment.lease_snapshot.land.location %></td>
+              <td><span class="badge bg-light text-dark"><%= payment.mode.humanize %></span></td>
+              <td><%= payment.lease_snapshot.financial_year %></td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <% else %>
+      <p class="text-muted">No payments recorded yet</p>
+      <% end %>
+    </div>
+
+    <% else %>
+    <div class="text-center py-5">
+      <h4 class="text-muted">No farming activities found</h4>
+      <p class="text-muted"><%= @person.name %> is not currently farming any lands</p>
+      <p class="text-muted">
+        Farming activities are created when lands are leased out to this person.
+      </p>
+    </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Performance Metrics -->
+<% if @lease_snapshots.any? %>
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h6>📈 Performance Metrics</h6>
+      </div>
+      <div class="card-body">
+        <% completed_leases = @lease_snapshots.select { |ls| ls.status == 'completed' } %>
+        <% if completed_leases.any? %>
+          <% avg_return_rate = completed_leases.sum { |ls| (ls.expected_return.to_f / ls.investment_amount) * 100 } / completed_leases.count %>
+          <p><strong>Average Return Rate:</strong> <%= sprintf('%.2f', avg_return_rate) %>%</p>
+          <p><strong>Completed Leases:</strong> <%= completed_leases.count %></p>
+          <p><strong>Success Rate:</strong> <%= sprintf('%.1f', (completed_leases.count.to_f / @lease_snapshots.count) * 100) %>%</p>
+        <% else %>
+          <p class="text-muted">No completed leases for performance analysis</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h6>📅 Activity Timeline</h6>
+      </div>
+      <div class="card-body">
+        <% years = @lease_snapshots.group_by(&:financial_year).sort.reverse %>
+        <% years.first(3).each do |year, leases| %>
+        <div class="mb-2">
+          <strong><%= year %>:</strong> 
+          <%= leases.count %> lease(s), 
+          ₹<%= number_with_delimiter(leases.sum(&:investment_amount)) %> invested
+        </div>
+        <% end %>
+        <% if years.count > 3 %>
+        <small class="text-muted">And <%= years.count - 3 %> more year(s)...</small>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
