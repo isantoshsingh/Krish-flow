@@ -102,5 +102,7 @@ bundle install
 # Setup the database
 rails db:create db:migrate db:seed
 
+*Database migrations have been created.*
+
 # Start the Rails server
 rails server
