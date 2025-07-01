@@ -1,0 +1,186 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "#{@person.name} - Owned Lands" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>🏞️ Lands Owned by <%= @person.name %></h1>
+  <div>
+    <%= link_to "Add New Land", new_land_path(landowner_id: @person.id), class: "btn btn-primary" %>
+    <%= link_to "View Profile", @person, class: "btn btn-outline-secondary" %>
+    <%= link_to "Back to People", people_path, class: "btn btn-outline-secondary" %>
+  </div>
+</div>
+
+<!-- Owner Summary -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>📋 Owner Details</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Name:</strong> <%= @person.name %></p>
+        <p><strong>Phone:</strong> <%= @person.phone %></p>
+        <p><strong>Location:</strong> <%= @person.full_address %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>📊 Land Portfolio Summary</h5>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="text-primary"><%= @lands.count %></h4>
+            <small class="text-muted">Total Lands</small>
+          </div>
+          <div class="col-4">
+            <h4 class="text-success"><%= @person.total_owned_land_size %></h4>
+            <small class="text-muted">Biswas</small>
+          </div>
+          <div class="col-4">
+            <h4 class="text-info"><%= @lands.select(&:is_leased?).count %></h4>
+            <small class="text-muted">Leased Out</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lands List -->
+<div class="card">
+  <div class="card-header">
+    <h5>🌾 Owned Lands</h5>
+  </div>
+  <div class="card-body">
+    <% if @lands.any? %>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Size</th>
+            <th>Status</th>
+            <th>Current Farmer</th>
+            <th>Financial Year</th>
+            <th>Investment</th>
+            <th>Expected Return</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @lands.each do |land| %>
+          <tr>
+            <td>
+              <strong><%= land.location %></strong>
+              <br>
+              <small class="text-muted"><%= land.display_size %></small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark"><%= land.size_in_biswas %> biswas</span>
+            </td>
+            <td>
+              <% if land.is_leased? %>
+                <span class="badge bg-success">Leased</span>
+              <% else %>
+                <span class="badge bg-secondary">Available</span>
+              <% end %>
+            </td>
+            <td>
+              <% current_lease = land.current_lease_snapshot %>
+              <% if current_lease %>
+                <%= link_to current_lease.farmer.name, person_path(current_lease.farmer), class: "text-decoration-none" %>
+                <br>
+                <small class="text-muted"><%= current_lease.farmer.phone %></small>
+              <% else %>
+                <span class="text-muted">-</span>
+              <% end %>
+            </td>
+            <td>
+              <% if current_lease %>
+                <%= current_lease.financial_year %>
+              <% else %>
+                <span class="text-muted">-</span>
+              <% end %>
+            </td>
+            <td>
+              <% if current_lease %>
+                <span class="text-success">₹<%= number_with_delimiter(current_lease.investment_amount) %></span>
+              <% else %>
+                <span class="text-muted">-</span>
+              <% end %>
+            </td>
+            <td>
+              <% if current_lease %>
+                <span class="text-info">₹<%= number_with_delimiter(current_lease.expected_return) %></span>
+              <% else %>
+                <span class="text-muted">-</span>
+              <% end %>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <%= link_to "View", land, class: "btn btn-sm btn-outline-primary" %>
+                <%= link_to "Edit", edit_land_path(land), class: "btn btn-sm btn-outline-secondary" %>
+                <% unless land.is_leased? %>
+                  <%= link_to "Lease Out", new_land_lease_snapshot_path(land), class: "btn btn-sm btn-outline-success" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Historical Lease Information -->
+    <% if @lands.any? { |land| land.lease_snapshots.any? } %>
+    <div class="mt-4">
+      <h6>📈 Historical Lease Summary</h6>
+      <div class="row">
+        <% total_investment = @lands.sum { |land| land.lease_snapshots.sum(:investment_amount) } %>
+        <% total_expected = @lands.sum { |land| land.lease_snapshots.sum(:expected_return) } %>
+        <% total_received = @lands.sum { |land| land.lease_snapshots.sum { |ls| ls.payments.sum(:amount) } } %>
+        
+        <div class="col-md-3">
+          <div class="text-center">
+            <h5 class="text-primary">₹<%= number_with_delimiter(total_investment) %></h5>
+            <small class="text-muted">Total Investment</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-center">
+            <h5 class="text-success">₹<%= number_with_delimiter(total_expected) %></h5>
+            <small class="text-muted">Expected Returns</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-center">
+            <h5 class="text-info">₹<%= number_with_delimiter(total_received) %></h5>
+            <small class="text-muted">Received Payments</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-center">
+            <h5 class="<%= total_expected - total_received > 0 ? 'text-warning' : 'text-success' %>">
+              ₹<%= number_with_delimiter(total_expected - total_received) %>
+            </h5>
+            <small class="text-muted">Outstanding</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% end %>
+    
+    <% else %>
+    <div class="text-center py-5">
+      <h4 class="text-muted">No lands owned</h4>
+      <p class="text-muted"><%= @person.name %> doesn't own any lands yet</p>
+      <%= link_to "Add First Land", new_land_path(landowner_id: @person.id), class: "btn btn-primary" %>
+    </div>
+    <% end %>
+  </div>
+</div>
