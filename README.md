@@ -46,6 +46,17 @@ It helps you manage lands leased from landowners and subleased to farmers, recor
 
 ## 🗂️ Data Model Overview
 
+For a detailed explanation of the data models, see [docs/models.md](docs/models.md).
+
+## 🔗 API Endpoints
+
+For a comprehensive list of API endpoints, see [docs/api.md](docs/api.md).
+
+## 🗄️ Database Schema
+
+For a detailed overview of the database schema, see [docs/database_schema.md](docs/database_schema.md).
+
+
 ```yaml
 Person:
   name: string
@@ -80,6 +91,9 @@ Payment:
 ---
 
 ## 🛠️ Tech Stack
+
+For a detailed breakdown of the technologies used, see [docs/tech_stack.md](docs/tech_stack.md).
+
 
 - **Backend**: Ruby on Rails 8
 - **Database**: PostgreSQL
