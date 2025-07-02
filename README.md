@@ -106,6 +106,7 @@ For a detailed breakdown of the technologies used, see [docs/tech_stack.md](docs
 ## 📚 Documentation & Guides
 
 - [User Manual](docs/user_guides/user_manual.md): A comprehensive guide for end-users and administrators on how to use KrishFlow.
+- [Admin Guide](docs/user_guides/admin_guide.md): Essential information for administrators managing the KrishFlow application.
 
 ## 🏁 Getting Started
 
